@@ -16,11 +16,11 @@ import { formatKRW } from "@/lib/formatKRW";
 export function AISummaryView({
   timeframe,
   onBack,
-  onGoToTips,
+  onGoToRecommendations,
 }: {
   timeframe: Timeframe;
   onBack: () => void;
-  onGoToTips: () => void;
+  onGoToRecommendations: () => void;
 }) {
   const [showAnalogy, setShowAnalogy] = useState(false);
   const summary = aiSummaryByTimeframe[timeframe];
@@ -112,8 +112,8 @@ export function AISummaryView({
         </section>
 
         <div className="flex justify-end">
-          <Button onClick={onGoToTips}>
-            Saving Tips <ArrowRight className="ml-1.5 h-4 w-4" />
+          <Button onClick={onGoToRecommendations}>
+            Recommendations <ArrowRight className="ml-1.5 h-4 w-4" />
           </Button>
         </div>
       </article>

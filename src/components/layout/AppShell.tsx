@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LineChart, Lightbulb, Target } from "lucide-react";
+import { Target } from "lucide-react";
 import { Toaster } from "sonner";
 import { Sidebar, type NavKey } from "./Sidebar";
 import { TopTabs } from "./TopTabs";
@@ -16,7 +16,9 @@ import { analogies } from "@/data/mockData";
 import { DEMO_ONBOARDING_ENABLED } from "@/config/onboarding";
 import type { Timeframe } from "@/types/energy";
 
-type SubView = "dashboard" | "summary" | "recommendations";
+type SubView = "dashboard" | "summary";
+
+type SwipeStart = { x: number; y: number } | null;
 
 export function AppShell() {
   const [nav, setNav] = useState<NavKey>("usage");
@@ -28,6 +30,7 @@ export function AppShell() {
   const [onboardingEnabled, setOnboardingEnabled] = useState(DEMO_ONBOARDING_ENABLED);
   const [coachmarkOpen, setCoachmarkOpen] = useState(DEMO_ONBOARDING_ENABLED);
   const [darkMode, setDarkMode] = useState(false);
+  const [swipeStart, setSwipeStart] = useState<SwipeStart>(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -61,6 +64,24 @@ export function AppShell() {
     setCoachmarkOpen(enabled);
   };
 
+  const finishViewSwipe = (x: number, y: number) => {
+    if (!swipeStart || Number.isNaN(x) || Number.isNaN(y)) {
+      setSwipeStart(null);
+      return;
+    }
+
+    const dx = x - swipeStart.x;
+    const dy = y - swipeStart.y;
+    setSwipeStart(null);
+    if (Math.abs(dx) < 90 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+
+    if (nav === "usage" && sub === "dashboard" && dx < 0) {
+      handleNav("recommendations");
+    } else if (nav === "recommendations" && dx > 0) {
+      handleNav("usage");
+    }
+  };
+
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-canvas text-foreground md:bg-background">
       <Sidebar
@@ -87,12 +108,15 @@ export function AppShell() {
             />
           </div>
 
-          <div className="min-h-0 flex-1 overflow-hidden">
+          <div
+            className="min-h-0 flex-1 overflow-hidden"
+            onPointerDown={(event) => setSwipeStart({ x: event.clientX, y: event.clientY })}
+            onPointerUp={(event) => finishViewSwipe(event.clientX, event.clientY)}
+            onPointerCancel={() => finishViewSwipe(Number.NaN, Number.NaN)}
+          >
             {nav === "usage" && sub === "dashboard" && (
               <DashboardView
                 timeframe={timeframe}
-                onOpenSummary={() => setSub("summary")}
-                onOpenRecommendations={() => setSub("recommendations")}
                 onExplainChart={() => setChartExplainOpen(true)}
                 onExplainCost={() => setCostExplainOpen(true)}
               />
@@ -101,27 +125,10 @@ export function AppShell() {
               <AISummaryView
                 timeframe={timeframe}
                 onBack={() => setSub("dashboard")}
-                onGoToTips={() => handleNav("tips")}
+                onGoToRecommendations={() => handleNav("recommendations")}
               />
             )}
-            {nav === "usage" && sub === "recommendations" && (
-              <RecommendationsView timeframe={timeframe} onBack={() => setSub("dashboard")} />
-            )}
-
-            {nav === "forecast" && (
-              <PlaceholderView
-                icon={LineChart}
-                title="Forecast preview"
-                description="A 7-day energy forecast lives here in the full product. For this demo, jump back to Current Energy Usage to see the AI Summary and Recommendations flows."
-              />
-            )}
-            {nav === "tips" && (
-              <PlaceholderView
-                icon={Lightbulb}
-                title="Saving Tips"
-                description="Personalized tips will appear here, generated from your usage history and local rate schedule."
-              />
-            )}
+            {nav === "recommendations" && <RecommendationsView timeframe={timeframe} />}
             {nav === "goals" && (
               <PlaceholderView
                 icon={Target}

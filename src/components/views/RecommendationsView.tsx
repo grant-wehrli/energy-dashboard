@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { SourceModal } from "@/components/modals/SourceModal";
 import { recommendationsByTimeframe, timeframeLabels } from "@/data/mockData";
 import { formatKRW } from "@/lib/formatKRW";
-import { cn } from "@/lib/utils";
 import type { Recommendation, Timeframe } from "@/types/energy";
 
 const AI_TRUST_COPY =
@@ -12,68 +11,67 @@ const AI_TRUST_COPY =
 
 export function RecommendationsView({
   timeframe,
-  onBack,
+  onSnapshot,
 }: {
   timeframe: Timeframe;
-  onBack: () => void;
+  onSnapshot?: () => void;
 }) {
   const [selectedRecommendation, setSelectedRecommendation] = useState<Recommendation | null>(null);
   const recommendations = recommendationsByTimeframe[timeframe];
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-canvas p-3 pb-28 sm:rounded-3xl sm:p-5 md:pb-5">
-      <button
-        type="button"
-        onClick={onBack}
-        className="mb-4 inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back
-      </button>
+    <div className="h-full min-h-0 overflow-y-auto bg-canvas px-4 pb-28 pt-4 sm:px-6 sm:pt-6 md:pb-6">
+      {onSnapshot && (
+        <button
+          type="button"
+          onClick={onSnapshot}
+          className="mb-4 inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90"
+        >
+          <ArrowLeft className="h-4 w-4" /> Snapshot
+        </button>
+      )}
 
-      <article className="flex-none space-y-4 overflow-visible rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-        <header className="flex items-start gap-3">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-xl font-semibold tracking-tight">
-              Recommendations for {timeframeLabels[timeframe].toLowerCase()}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Each suggestion links to the evidence, calculation, and source behind it.
-            </p>
-          </div>
+      <div className="mx-auto max-w-5xl space-y-8">
+        <header className="max-w-3xl">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            Recommendations for {timeframeLabels[timeframe].toLowerCase()}
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground md:hidden">
+            Swipe right to return to Snapshot.
+          </p>
         </header>
 
-        <TrustCallout confidence="medium" />
-
-        <ol className="space-y-4">
+        <ol className="divide-y divide-border/70">
           {recommendations.map((r, i) => (
-            <li key={r.id} className="rounded-2xl border border-border bg-secondary/30 p-4">
-              <div className="mb-2 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary">
-                  {i + 1}
-                </span>
-                <span>Recommendation</span>
-                <span
-                  className={cn(
-                    "rounded-full border px-2 py-0.5 uppercase",
-                    r.confidence === "low"
-                      ? "border-destructive/30 bg-destructive/10 text-destructive"
-                      : "border-primary/20 bg-primary/10 text-primary",
-                  )}
-                >
-                  {r.confidence} confidence
+            <li key={r.id} className="grid gap-4 py-7 lg:grid-cols-[10rem_1fr_auto] lg:items-start">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 lg:block lg:space-y-2">
+                <span className="text-2xl font-semibold leading-none text-primary sm:text-3xl lg:block">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
                 {r.estimatedSavings && (
-                  <span className="rounded-full border border-border bg-card px-2 py-0.5 text-foreground">
-                    {formatKRW(r.estimatedSavings)} est.
+                  <span className="text-base font-semibold text-foreground lg:block">
+                    {formatKRW(r.estimatedSavings)}
                   </span>
                 )}
+                <span
+                  className={
+                    r.confidence === "low"
+                      ? "text-xs font-medium uppercase tracking-wide text-destructive lg:block"
+                      : "text-xs font-medium uppercase tracking-wide text-muted-foreground lg:block"
+                  }
+                >
+                  {r.confidence}
+                </span>
               </div>
-              <h3 className="text-base font-semibold">{r.title}</h3>
-              <p className="mt-1 text-sm leading-relaxed text-foreground/80">{r.body}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
+
+              <div className="min-w-0">
+                <h3 className="text-xl font-semibold tracking-tight">{r.title}</h3>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-foreground/75 sm:text-base">
+                  {r.body}
+                </p>
+              </div>
+
+              <div className="flex shrink-0 flex-wrap gap-2 lg:justify-end">
                 <Button variant="secondary" size="sm" onClick={() => setSelectedRecommendation(r)}>
                   <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Why this?
                 </Button>
@@ -84,7 +82,9 @@ export function RecommendationsView({
             </li>
           ))}
         </ol>
-      </article>
+
+        <TrustCallout confidence="medium" />
+      </div>
 
       <SourceModal
         open={!!selectedRecommendation}
@@ -101,12 +101,7 @@ function TrustCallout({ confidence }: { confidence: Recommendation["confidence"]
 
   return (
     <div
-      className={cn(
-        "flex items-start gap-2 rounded-2xl border p-3 text-xs leading-relaxed",
-        low
-          ? "border-destructive/30 bg-destructive/10 text-destructive"
-          : "border-border bg-secondary/40 text-muted-foreground",
-      )}
+      className={`flex max-w-3xl items-start gap-2 text-xs leading-relaxed ${low ? "text-destructive" : "text-muted-foreground"}`}
     >
       {low ? (
         <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />

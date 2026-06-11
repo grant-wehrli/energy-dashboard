@@ -1,15 +1,14 @@
-import { Settings, Gauge, LineChart, Lightbulb, Target, Zap, Sparkles } from "lucide-react";
+import { Settings, Gauge, ListChecks, Target, Zap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { brand } from "@/data/mockData";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 
-export type NavKey = "usage" | "forecast" | "tips" | "goals";
+export type NavKey = "usage" | "recommendations" | "goals";
 
 const items: { key: NavKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: "usage", label: "Current Energy Usage", icon: Gauge },
-  { key: "forecast", label: "Forecast preview", icon: LineChart },
-  { key: "tips", label: "Saving Tips", icon: Lightbulb },
+  { key: "usage", label: "Snapshot", icon: Gauge },
+  { key: "recommendations", label: "Recommendations", icon: ListChecks },
   { key: "goals", label: "Goals & Milestones", icon: Target },
 ];
 
@@ -60,7 +59,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onHome}
-          aria-label="Go to dashboard"
+          aria-label="Go to snapshot"
           className="flex items-center gap-3 rounded-2xl bg-secondary/60 px-3 py-4 text-left transition-colors hover:bg-secondary"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
@@ -101,6 +100,15 @@ export function Sidebar({
         className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden"
         aria-label="Main"
       >
+        {active === "usage" && !askAIAttention && (
+          <button
+            type="button"
+            onClick={() => onChange("recommendations")}
+            className="absolute bottom-[calc(env(safe-area-inset-bottom)+4.7rem)] left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-semibold text-primary-foreground shadow-[0_12px_34px_oklch(0_0_0/0.18)] transition-transform hover:-translate-x-1/2 hover:-translate-y-0.5"
+          >
+            Swipe for recs -&gt;
+          </button>
+        )}
         <div className="liquid-glass-pill mx-auto grid max-w-sm grid-cols-5 gap-1 rounded-full p-1.5">
           {mobileItems.map((it) => {
             const Icon = it.icon;
@@ -130,7 +138,7 @@ export function Sidebar({
             className={cn(
               "-my-1 flex min-h-[58px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-semibold text-foreground transition-all hover:bg-secondary",
               askAIAttention &&
-                "bg-primary/10 text-primary ring-2 ring-primary/45 ring-offset-2 ring-offset-canvas shadow-[0_0_26px_oklch(0.62_0.17_249/0.36)]",
+                "bg-primary/10 text-primary ring-2 ring-primary/45 ring-offset-2 ring-offset-canvas shadow-[0_0_26px_oklch(0.84_0.16_86/0.36)]",
             )}
           >
             <Sparkles className="h-5 w-5 shrink-0 text-primary" />
@@ -179,18 +187,16 @@ const mobileItems: {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { key: "usage", label: "Usage", icon: Gauge },
-  { key: "forecast", label: "Forecast", icon: LineChart },
+  { key: "usage", label: "Snapshot", icon: Gauge },
+  { key: "recommendations", label: "Recs", icon: ListChecks },
 ];
 
 function mobileLabel(key: NavKey) {
   switch (key) {
     case "usage":
-      return "Usage";
-    case "forecast":
-      return "Forecast";
-    case "tips":
-      return "Tips";
+      return "Snapshot";
+    case "recommendations":
+      return "Recs";
     case "goals":
       return "Goals";
   }
