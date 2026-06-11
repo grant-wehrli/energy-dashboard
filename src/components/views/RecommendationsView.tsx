@@ -16,7 +16,7 @@ export function RecommendationsView({
   const recommendations = recommendationsByTimeframe[timeframe];
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl bg-canvas p-5">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto rounded-3xl bg-canvas p-3 sm:p-5 lg:overflow-hidden">
       <button
         type="button"
         onClick={onBack}
@@ -25,16 +25,18 @@ export function RecommendationsView({
         <ArrowLeft className="h-4 w-4" /> Back
       </button>
 
-      <article className="min-h-0 flex-1 space-y-4 overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-sm">
-        <header className="flex items-center gap-3">
+      <article className="flex-none space-y-4 overflow-visible rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <header className="flex items-start gap-3">
           <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
             <Sparkles className="h-5 w-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h2 className="text-xl font-semibold tracking-tight">
               Recommendations for {timeframeLabels[timeframe].toLowerCase()}
             </h2>
-            <p className="text-sm text-muted-foreground">Each suggestion links to the data and source behind it.</p>
+            <p className="text-sm text-muted-foreground">
+              Each suggestion links to the data and source behind it.
+            </p>
           </div>
         </header>
 

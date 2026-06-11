@@ -6,10 +6,10 @@ export function AskAIButton({ onClick }: { onClick: () => void }) {
       type="button"
       onClick={onClick}
       aria-label="Ask AI"
-      className="group inline-flex h-[72px] w-[72px] flex-col items-center justify-center gap-0.5 rounded-full border border-border bg-card text-foreground shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5"
+      className="group inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-border bg-card px-3 text-foreground shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg sm:h-[72px] sm:w-[72px] sm:flex-col sm:gap-0.5 sm:rounded-full sm:px-0"
     >
-      <Sparkles className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
-      <span className="text-[11px] font-semibold tracking-wide">Ask AI</span>
+      <Sparkles className="h-5 w-5 text-primary transition-transform group-hover:scale-110 sm:h-6 sm:w-6" />
+      <span className="text-[11px] font-semibold tracking-wide sm:text-[11px]">Ask AI</span>
     </button>
   );
 }

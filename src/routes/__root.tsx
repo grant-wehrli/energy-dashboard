@@ -10,6 +10,8 @@ import {
 
 import appCss from "../styles.css?url";
 
+const stylesheetHref = import.meta.env.DEV ? `${appCss}?direct` : appCss;
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -86,7 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       {
         rel: "stylesheet",
-        href: appCss,
+        href: stylesheetHref,
       },
     ],
   }),

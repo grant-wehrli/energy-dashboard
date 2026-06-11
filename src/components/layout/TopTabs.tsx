@@ -21,7 +21,7 @@ export function TopTabs({
 }) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   return (
-    <div className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card p-1 shadow-sm">
+    <div className="grid min-w-0 flex-1 grid-cols-[repeat(3,minmax(0,1fr))_auto] items-center gap-1 rounded-2xl border border-border bg-card p-1 shadow-sm sm:inline-flex sm:flex-none sm:gap-2">
       {tabs.map((t) => {
         const active = value === t.key;
         return (
@@ -30,7 +30,7 @@ export function TopTabs({
             type="button"
             onClick={() => onChange(t.key)}
             className={cn(
-              "rounded-xl px-4 py-2 text-sm font-medium transition-colors",
+              "min-w-0 rounded-xl px-2 py-2 text-xs font-medium transition-colors sm:px-4 sm:text-sm",
               active
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-muted",

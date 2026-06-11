@@ -38,23 +38,28 @@ export function DashboardView({
   const summary = aiSummaryByTimeframe[timeframe];
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-3xl bg-canvas p-4">
-      <div className="mb-3 flex shrink-0 flex-wrap items-end justify-between gap-2">
-        <div>
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto rounded-3xl bg-canvas p-3 sm:p-4 lg:overflow-hidden">
+      <div className="mb-3 flex shrink-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight">
             {timeframeLabels[timeframe]} at a glance
           </h2>
           <p className="text-xs text-muted-foreground">
-            {totalKwh.toFixed(1)} kWh used · estimated {formatKRW(costStats.estimated)} {summary.savingLabel}
+            {totalKwh.toFixed(1)} kWh used · estimated {formatKRW(costStats.estimated)}{" "}
+            {summary.savingLabel}
           </p>
         </div>
-        <div className="flex gap-2 text-xs">
+        <div className="grid grid-cols-2 gap-2 text-xs sm:flex">
           <Stat label="Saved this month" value={formatKRW(costStats.savedThisMonth)} tone="good" />
-          <Stat label="Potential savings" value={formatKRW(costStats.potentialSavings)} tone="accent" />
+          <Stat
+            label="Potential savings"
+            value={formatKRW(costStats.potentialSavings)}
+            tone="accent"
+          />
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-2 gap-3 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-2 lg:grid-rows-2">
         <DashboardCard
           title="Energy usage"
           subtitle={`${timeframeLabels[timeframe]} · kWh`}
@@ -64,7 +69,7 @@ export function DashboardView({
             </Button>
           }
         >
-          <div className="h-full w-full">
+          <div className="h-[210px] w-full lg:h-full">
             <UsageBarChart data={data} fill />
           </div>
         </DashboardCard>
@@ -97,11 +102,11 @@ export function DashboardView({
             </Button>
           }
         >
-          <div className="flex h-full items-center gap-3">
-            <div className="h-full flex-1">
+          <div className="flex h-full flex-col items-center gap-3 sm:flex-row">
+            <div className="h-48 w-full sm:h-full sm:flex-1">
               <CostPie data={costBreakdown} total={totalCost} />
             </div>
-            <ul className="hidden flex-1 space-y-1 text-xs sm:block">
+            <ul className="grid w-full grid-cols-1 gap-1 text-xs sm:block sm:flex-1 sm:space-y-1">
               {costBreakdown.map((c) => (
                 <li key={c.name} className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-sm" style={{ background: c.color }} />
@@ -133,9 +138,15 @@ export function DashboardView({
 
 function Stat({ label, value, tone }: { label: string; value: string; tone: "good" | "accent" }) {
   return (
-    <div className="rounded-xl border border-border bg-card px-3 py-1.5 shadow-sm">
+    <div className="min-w-0 rounded-xl border border-border bg-card px-3 py-1.5 shadow-sm">
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={tone === "good" ? "text-sm font-semibold text-primary" : "text-sm font-semibold text-foreground"}>
+      <div
+        className={
+          tone === "good"
+            ? "text-sm font-semibold text-primary"
+            : "text-sm font-semibold text-foreground"
+        }
+      >
         {value}
       </div>
     </div>

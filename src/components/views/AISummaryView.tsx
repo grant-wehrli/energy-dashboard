@@ -30,7 +30,7 @@ export function AISummaryView({
   const analogy = analogies[summary.analogyKey];
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl bg-canvas p-5">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto rounded-3xl bg-canvas p-3 sm:p-5 lg:overflow-hidden">
       <button
         type="button"
         onClick={onBack}
@@ -39,15 +39,19 @@ export function AISummaryView({
         <ArrowLeft className="h-4 w-4" /> Back
       </button>
 
-      <article className="min-h-0 flex-1 space-y-5 overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <article className="flex-none space-y-5 overflow-visible rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <header>
-          <h2 className="text-2xl font-semibold tracking-tight">{summary.detailTitle}</h2>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            {summary.detailTitle}
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">{summary.detailSubtitle}</p>
         </header>
 
         <section>
           <h3 className="mb-2 text-sm font-semibold">Energy use</h3>
-          <UsageBarChart data={usage} />
+          <div className="h-[220px] sm:h-[240px]">
+            <UsageBarChart data={usage} fill />
+          </div>
         </section>
 
         <section className="rounded-xl bg-secondary/40 p-4 text-sm leading-relaxed">

@@ -46,9 +46,9 @@ export function AppShell() {
     <div className="flex h-dvh w-full overflow-hidden bg-background text-foreground">
       <Sidebar active={nav} onChange={handleNav} onHome={handleHome} />
 
-      <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col overflow-hidden px-6 py-4">
-          <div className="mb-4 flex shrink-0 items-start justify-between gap-4">
+      <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden pb-20 md:pb-0">
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col overflow-hidden px-3 py-3 sm:px-4 md:px-6 md:py-4">
+          <div className="mb-3 flex shrink-0 items-start justify-between gap-3 md:mb-4 md:gap-4">
             <TopTabs value={timeframe} onChange={handleTimeframe} />
             <AskAIButton onClick={() => setChatOpen(true)} />
           </div>

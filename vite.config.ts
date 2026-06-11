@@ -5,9 +5,9 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    command === "build" && cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart({
       server: { entry: "./src/server.ts" },
     }),
@@ -21,4 +21,4 @@ export default defineConfig({
     port: 3000,
     strictPort: true,
   },
-});
+}));
