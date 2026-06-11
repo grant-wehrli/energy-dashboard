@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Switch } from "@/components/ui/switch";
 
 export type NavKey = "usage" | "recommendations" | "goals";
+export type AccentColor = "yellow" | "blue" | "green" | "rose";
 
 const items: { key: NavKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { key: "usage", label: "Snapshot", icon: Gauge },
@@ -22,6 +23,9 @@ export function Sidebar({
   onOnboardingChange,
   darkMode,
   onDarkModeChange,
+  accentColor,
+  onAccentColorChange,
+  showRecommendationHint,
   onSettingsOpen,
 }: {
   active: NavKey;
@@ -33,8 +37,13 @@ export function Sidebar({
   onOnboardingChange: (enabled: boolean) => void;
   darkMode: boolean;
   onDarkModeChange: (enabled: boolean) => void;
+  accentColor: AccentColor;
+  onAccentColorChange: (color: AccentColor) => void;
+  showRecommendationHint: boolean;
   onSettingsOpen?: () => void;
 }) {
+  const mobileActiveIndex = active === "recommendations" ? 1 : active === "goals" ? 3 : 0;
+
   return (
     <>
       <aside className="hidden h-dvh w-64 shrink-0 flex-col gap-6 overflow-hidden border-r border-border bg-sidebar p-4 md:flex">
@@ -53,6 +62,8 @@ export function Sidebar({
             onOnboardingChange={onOnboardingChange}
             darkMode={darkMode}
             onDarkModeChange={onDarkModeChange}
+            accentColor={accentColor}
+            onAccentColorChange={onAccentColorChange}
           />
         </Popover>
 
@@ -100,16 +111,24 @@ export function Sidebar({
         className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden"
         aria-label="Main"
       >
-        {active === "usage" && !askAIAttention && (
+        {active === "usage" && showRecommendationHint && !askAIAttention && (
           <button
             type="button"
             onClick={() => onChange("recommendations")}
-            className="absolute bottom-[calc(env(safe-area-inset-bottom)+4.7rem)] left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-semibold text-primary-foreground shadow-[0_12px_34px_oklch(0_0_0/0.18)] transition-transform hover:-translate-x-1/2 hover:-translate-y-0.5"
+            className="absolute bottom-[calc(env(safe-area-inset-bottom)+4.7rem)] left-1/2 z-10 -translate-x-1/2 animate-in fade-in slide-in-from-bottom-2 whitespace-nowrap rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-semibold text-primary-foreground shadow-[0_12px_34px_oklch(0_0_0/0.18)] duration-300 hover:-translate-x-1/2 hover:-translate-y-0.5"
           >
             Swipe for recs -&gt;
           </button>
         )}
-        <div className="liquid-glass-pill mx-auto grid max-w-sm grid-cols-5 gap-1 rounded-full p-1.5">
+        <div className="liquid-glass-pill relative mx-auto grid max-w-sm grid-cols-5 gap-1 rounded-full p-1.5">
+          <span
+            aria-hidden="true"
+            className="mobile-nav-selection absolute bottom-1.5 top-1.5 z-0 rounded-full"
+            style={{
+              left: `calc(0.375rem + ${mobileActiveIndex} * ((100% - 0.75rem) / 5))`,
+              width: "calc((100% - 0.75rem) / 5)",
+            }}
+          />
           {mobileItems.map((it) => {
             const Icon = it.icon;
             const isActive = active === it.key;
@@ -120,9 +139,7 @@ export function Sidebar({
                 onClick={() => onChange(it.key)}
                 className={cn(
                   "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-medium transition-all",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-foreground/70 hover:bg-secondary",
+                  isActive ? "text-primary-foreground" : "text-foreground/70 hover:bg-secondary",
                 )}
                 aria-current={isActive ? "page" : undefined}
               >
@@ -138,7 +155,7 @@ export function Sidebar({
             className={cn(
               "-my-1 flex min-h-[58px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-semibold text-foreground transition-all hover:bg-secondary",
               askAIAttention &&
-                "bg-primary/10 text-primary ring-2 ring-primary/45 ring-offset-2 ring-offset-canvas shadow-[0_0_26px_oklch(0.84_0.16_86/0.36)]",
+                "accent-attention-glow bg-primary/10 text-primary ring-2 ring-primary/45 ring-offset-2 ring-offset-canvas",
             )}
           >
             <Sparkles className="h-5 w-5 shrink-0 text-primary" />
@@ -150,7 +167,7 @@ export function Sidebar({
             className={cn(
               "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-medium transition-all",
               active === "goals"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "text-primary-foreground"
                 : "text-foreground/70 hover:bg-secondary",
             )}
             aria-current={active === "goals" ? "page" : undefined}
@@ -174,6 +191,8 @@ export function Sidebar({
               onOnboardingChange={onOnboardingChange}
               darkMode={darkMode}
               onDarkModeChange={onDarkModeChange}
+              accentColor={accentColor}
+              onAccentColorChange={onAccentColorChange}
             />
           </Popover>
         </div>
@@ -207,11 +226,15 @@ function SettingsPopover({
   onOnboardingChange,
   darkMode,
   onDarkModeChange,
+  accentColor,
+  onAccentColorChange,
 }: {
   onboardingEnabled: boolean;
   onOnboardingChange: (enabled: boolean) => void;
   darkMode: boolean;
   onDarkModeChange: (enabled: boolean) => void;
+  accentColor: AccentColor;
+  onAccentColorChange: (color: AccentColor) => void;
 }) {
   return (
     <PopoverContent
@@ -245,6 +268,38 @@ function SettingsPopover({
         </span>
         <Switch checked={darkMode} onCheckedChange={onDarkModeChange} />
       </label>
+
+      <div className="mt-4">
+        <div className="text-sm font-medium">Accent color</div>
+        <div className="mt-2 grid grid-cols-4 gap-2">
+          {accentOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onAccentColorChange(option.value)}
+              aria-label={`Use ${option.label} accent`}
+              className={cn(
+                "flex h-12 items-center justify-center rounded-xl border text-xs font-medium transition-all",
+                accentColor === option.value
+                  ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/40"
+                  : "border-border bg-secondary/30 text-muted-foreground hover:bg-secondary",
+              )}
+            >
+              <span
+                className="h-5 w-5 rounded-full shadow-sm"
+                style={{ background: option.color }}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
     </PopoverContent>
   );
 }
+
+const accentOptions: { value: AccentColor; label: string; color: string }[] = [
+  { value: "yellow", label: "Yellow", color: "oklch(0.74 0.17 82)" },
+  { value: "blue", label: "Blue", color: "oklch(0.58 0.13 245)" },
+  { value: "green", label: "Green", color: "oklch(0.62 0.14 150)" },
+  { value: "rose", label: "Rose", color: "oklch(0.63 0.18 22)" },
+];

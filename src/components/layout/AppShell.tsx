@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Target } from "lucide-react";
 import { Toaster } from "sonner";
-import { Sidebar, type NavKey } from "./Sidebar";
+import { Sidebar, type AccentColor, type NavKey } from "./Sidebar";
 import { TopTabs } from "./TopTabs";
 import { AskAIButton } from "./AskAIButton";
 import { DashboardView } from "@/components/views/DashboardView";
@@ -20,6 +20,8 @@ type SubView = "dashboard" | "summary";
 
 type SwipeStart = { x: number; y: number } | null;
 
+const RECOMMENDATION_HINT_DISMISSED_KEY = "energy-dashboard-recommendation-hint-dismissed";
+
 export function AppShell() {
   const [nav, setNav] = useState<NavKey>("usage");
   const [sub, setSub] = useState<SubView>("dashboard");
@@ -30,13 +32,35 @@ export function AppShell() {
   const [onboardingEnabled, setOnboardingEnabled] = useState(DEMO_ONBOARDING_ENABLED);
   const [coachmarkOpen, setCoachmarkOpen] = useState(DEMO_ONBOARDING_ENABLED);
   const [darkMode, setDarkMode] = useState(false);
+  const [accentColor, setAccentColor] = useState<AccentColor>("yellow");
   const [swipeStart, setSwipeStart] = useState<SwipeStart>(null);
+  const [recommendationHintVisible, setRecommendationHintVisible] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
+  useEffect(() => {
+    document.documentElement.dataset.accent = accentColor;
+  }, [accentColor]);
+
+  useEffect(() => {
+    if (window.localStorage.getItem(RECOMMENDATION_HINT_DISMISSED_KEY) === "true") return;
+
+    const timeout = window.setTimeout(() => {
+      setRecommendationHintVisible(true);
+    }, 1000);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  const dismissRecommendationHint = () => {
+    setRecommendationHintVisible(false);
+    window.localStorage.setItem(RECOMMENDATION_HINT_DISMISSED_KEY, "true");
+  };
+
   const handleNav = (k: NavKey) => {
+    if (k === "recommendations") dismissRecommendationHint();
     setNav(k);
     setSub("dashboard");
   };
@@ -94,6 +118,9 @@ export function AppShell() {
         onOnboardingChange={handleOnboardingChange}
         darkMode={darkMode}
         onDarkModeChange={setDarkMode}
+        accentColor={accentColor}
+        onAccentColorChange={setAccentColor}
+        showRecommendationHint={recommendationHintVisible}
         onSettingsOpen={() => setCoachmarkOpen(false)}
       />
 
@@ -114,12 +141,27 @@ export function AppShell() {
             onPointerUp={(event) => finishViewSwipe(event.clientX, event.clientY)}
             onPointerCancel={() => finishViewSwipe(Number.NaN, Number.NaN)}
           >
-            {nav === "usage" && sub === "dashboard" && (
-              <DashboardView
-                timeframe={timeframe}
-                onExplainChart={() => setChartExplainOpen(true)}
-                onExplainCost={() => setCostExplainOpen(true)}
-              />
+            {(nav === "usage" || nav === "recommendations") && sub === "dashboard" && (
+              <div className="h-full overflow-hidden">
+                <div
+                  data-view-slider
+                  className="flex h-full w-[200%] transition-transform duration-500 ease-out"
+                  style={{
+                    transform: nav === "recommendations" ? "translateX(-50%)" : "translateX(0)",
+                  }}
+                >
+                  <section className="h-full w-1/2 shrink-0 overflow-hidden">
+                    <DashboardView
+                      timeframe={timeframe}
+                      onExplainChart={() => setChartExplainOpen(true)}
+                      onExplainCost={() => setCostExplainOpen(true)}
+                    />
+                  </section>
+                  <section className="h-full w-1/2 shrink-0 overflow-hidden">
+                    <RecommendationsView timeframe={timeframe} />
+                  </section>
+                </div>
+              </div>
             )}
             {nav === "usage" && sub === "summary" && (
               <AISummaryView
@@ -128,7 +170,6 @@ export function AppShell() {
                 onGoToRecommendations={() => handleNav("recommendations")}
               />
             )}
-            {nav === "recommendations" && <RecommendationsView timeframe={timeframe} />}
             {nav === "goals" && (
               <PlaceholderView
                 icon={Target}
