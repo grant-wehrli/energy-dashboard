@@ -139,7 +139,7 @@ export function AppShell() {
         onDismiss={() => setCoachmarkOpen(false)}
       />
       <ChatPanel open={chatOpen} onOpenChange={setChatOpen} timeframe={timeframe} />
-      <SourceModal open={costExplainOpen} onOpenChange={setCostExplainOpen} />
+      <SourceModal open={costExplainOpen} onOpenChange={setCostExplainOpen} timeframe={timeframe} />
       <AnalogyModal
         analogy={chartExplainOpen ? analogies.rushHour : null}
         open={chartExplainOpen}

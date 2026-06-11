@@ -128,11 +128,12 @@ export function Sidebar({
             onClick={onAskAI}
             aria-label="Ask AI"
             className={cn(
-              "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-semibold text-foreground transition-all hover:bg-secondary",
-              askAIAttention && "ring-2 ring-primary/30 ring-offset-2 ring-offset-canvas",
+              "-my-1 flex min-h-[58px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-semibold text-foreground transition-all hover:bg-secondary",
+              askAIAttention &&
+                "bg-primary/10 text-primary ring-2 ring-primary/45 ring-offset-2 ring-offset-canvas shadow-[0_0_26px_oklch(0.62_0.17_249/0.36)]",
             )}
           >
-            <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+            <Sparkles className="h-5 w-5 shrink-0 text-primary" />
             <span className="max-w-full truncate">Ask AI</span>
           </button>
           <button

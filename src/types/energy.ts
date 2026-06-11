@@ -22,12 +22,28 @@ export interface Recommendation {
   id: string;
   title: string;
   body: string;
+  estimatedSavings?: number;
+  confidence: "high" | "medium" | "low";
+  evidence: string[];
+  calculation: { label: string; value: string }[];
+  limitations: string[];
+  sourceIds: string[];
 }
 
 export interface SourceCitation {
+  id: string;
   label: string;
   citation: string;
   url: string;
+}
+
+export interface ProactiveAction {
+  id: string;
+  title: string;
+  body: string;
+  actionLabel: string;
+  tone: "saving" | "forecast" | "comfort";
+  relatedRecommendationId: string;
 }
 
 export type AnalogyKey =
