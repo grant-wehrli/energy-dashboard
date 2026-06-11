@@ -38,7 +38,7 @@ export function DashboardView({
   const summary = aiSummaryByTimeframe[timeframe];
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-y-auto rounded-3xl bg-canvas p-3 sm:p-4 lg:overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-canvas p-3 sm:rounded-3xl sm:p-4 lg:overflow-hidden">
       <div className="mb-3 flex shrink-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight">

@@ -16,7 +16,7 @@ export function RecommendationsView({
   const recommendations = recommendationsByTimeframe[timeframe];
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-y-auto rounded-3xl bg-canvas p-3 sm:p-5 lg:overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-canvas p-3 sm:rounded-3xl sm:p-5 lg:overflow-hidden">
       <button
         type="button"
         onClick={onBack}

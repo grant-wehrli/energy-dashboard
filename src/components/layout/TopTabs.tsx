@@ -21,7 +21,7 @@ export function TopTabs({
 }) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   return (
-    <div className="grid min-w-0 flex-1 grid-cols-[repeat(3,minmax(0,1fr))_auto] items-center gap-1 rounded-2xl border border-border bg-card p-1 shadow-sm sm:inline-flex sm:flex-none sm:gap-2">
+    <div className="liquid-glass-pill grid min-w-0 flex-1 grid-cols-[repeat(3,minmax(0,1fr))_auto] items-center gap-1 rounded-full p-1 sm:inline-flex sm:flex-none sm:gap-2">
       {tabs.map((t) => {
         const active = value === t.key;
         return (
@@ -30,10 +30,10 @@ export function TopTabs({
             type="button"
             onClick={() => onChange(t.key)}
             className={cn(
-              "min-w-0 rounded-xl px-2 py-2 text-xs font-medium transition-colors sm:px-4 sm:text-sm",
+              "min-w-0 rounded-full px-2 py-2 text-xs font-medium transition-colors sm:px-4 sm:text-sm",
               active
                 ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-muted",
+                : "text-muted-foreground hover:bg-card/70",
             )}
             aria-pressed={active}
           >
@@ -46,7 +46,7 @@ export function TopTabs({
           <button
             type="button"
             aria-label="Pick a custom date"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-card/70"
           >
             <CalendarDays className="h-4 w-4" />
           </button>

@@ -1,6 +1,8 @@
-import { Settings, Gauge, LineChart, Lightbulb, Target, Zap } from "lucide-react";
+import { Settings, Gauge, LineChart, Lightbulb, Target, Zap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { brand } from "@/data/mockData";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 
 export type NavKey = "usage" | "forecast" | "tips" | "goals";
 
@@ -15,21 +17,45 @@ export function Sidebar({
   active,
   onChange,
   onHome,
+  onAskAI,
+  askAIAttention = false,
+  onboardingEnabled,
+  onOnboardingChange,
+  darkMode,
+  onDarkModeChange,
+  onSettingsOpen,
 }: {
   active: NavKey;
   onChange: (k: NavKey) => void;
   onHome?: () => void;
+  onAskAI: () => void;
+  askAIAttention?: boolean;
+  onboardingEnabled: boolean;
+  onOnboardingChange: (enabled: boolean) => void;
+  darkMode: boolean;
+  onDarkModeChange: (enabled: boolean) => void;
+  onSettingsOpen?: () => void;
 }) {
   return (
     <>
       <aside className="hidden h-dvh w-64 shrink-0 flex-col gap-6 overflow-hidden border-r border-border bg-sidebar p-4 md:flex">
-        <button
-          type="button"
-          aria-label="Open settings"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
-        >
-          <Settings className="h-5 w-5" />
-        </button>
+        <Popover onOpenChange={(open) => open && onSettingsOpen?.()}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-label="Open settings"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
+            >
+              <Settings className="h-5 w-5" />
+            </button>
+          </PopoverTrigger>
+          <SettingsPopover
+            onboardingEnabled={onboardingEnabled}
+            onOnboardingChange={onOnboardingChange}
+            darkMode={darkMode}
+            onDarkModeChange={onDarkModeChange}
+          />
+        </Popover>
 
         <button
           type="button"
@@ -72,11 +98,11 @@ export function Sidebar({
       </aside>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-sidebar/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 shadow-[0_-8px_24px_oklch(0_0_0/0.08)] backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden"
         aria-label="Main"
       >
-        <div className="mx-auto grid max-w-lg grid-cols-4 gap-1">
-          {items.map((it) => {
+        <div className="liquid-glass-pill mx-auto grid max-w-sm grid-cols-5 gap-1 rounded-full p-1.5">
+          {mobileItems.map((it) => {
             const Icon = it.icon;
             const isActive = active === it.key;
             return (
@@ -85,10 +111,10 @@ export function Sidebar({
                 type="button"
                 onClick={() => onChange(it.key)}
                 className={cn(
-                  "flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-2 text-[11px] font-medium transition-colors",
+                  "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-medium transition-all",
                   isActive
                     ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-foreground/70 hover:bg-muted",
+                    : "text-foreground/70 hover:bg-secondary",
                 )}
                 aria-current={isActive ? "page" : undefined}
               >
@@ -97,11 +123,64 @@ export function Sidebar({
               </button>
             );
           })}
+          <button
+            type="button"
+            onClick={onAskAI}
+            aria-label="Ask AI"
+            className={cn(
+              "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-semibold text-foreground transition-all hover:bg-secondary",
+              askAIAttention && "ring-2 ring-primary/30 ring-offset-2 ring-offset-canvas",
+            )}
+          >
+            <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+            <span className="max-w-full truncate">Ask AI</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange("goals")}
+            className={cn(
+              "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-medium transition-all",
+              active === "goals"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-foreground/70 hover:bg-secondary",
+            )}
+            aria-current={active === "goals" ? "page" : undefined}
+          >
+            <Target className="h-4 w-4 shrink-0" />
+            <span className="max-w-full truncate">Goals</span>
+          </button>
+          <Popover onOpenChange={(open) => open && onSettingsOpen?.()}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                aria-label="Open settings"
+                className="flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-1.5 text-[10px] font-medium text-foreground/70 transition-colors hover:bg-secondary"
+              >
+                <Settings className="h-4 w-4 shrink-0" />
+                <span className="max-w-full truncate">Settings</span>
+              </button>
+            </PopoverTrigger>
+            <SettingsPopover
+              onboardingEnabled={onboardingEnabled}
+              onOnboardingChange={onOnboardingChange}
+              darkMode={darkMode}
+              onDarkModeChange={onDarkModeChange}
+            />
+          </Popover>
         </div>
       </nav>
     </>
   );
 }
+
+const mobileItems: {
+  key: NavKey;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  { key: "usage", label: "Usage", icon: Gauge },
+  { key: "forecast", label: "Forecast", icon: LineChart },
+];
 
 function mobileLabel(key: NavKey) {
   switch (key) {
@@ -114,4 +193,51 @@ function mobileLabel(key: NavKey) {
     case "goals":
       return "Goals";
   }
+}
+
+function SettingsPopover({
+  onboardingEnabled,
+  onOnboardingChange,
+  darkMode,
+  onDarkModeChange,
+}: {
+  onboardingEnabled: boolean;
+  onOnboardingChange: (enabled: boolean) => void;
+  darkMode: boolean;
+  onDarkModeChange: (enabled: boolean) => void;
+}) {
+  return (
+    <PopoverContent
+      align="end"
+      sideOffset={12}
+      className="w-72 rounded-2xl border-white/70 bg-card/90 p-4 shadow-[0_18px_50px_oklch(0_0_0/0.16)] backdrop-blur-xl"
+    >
+      <div>
+        <h2 className="text-sm font-semibold tracking-tight">Demo settings</h2>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          Controls used to tune the walkthrough during presentations.
+        </p>
+      </div>
+
+      <label className="mt-4 flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border bg-secondary/30 p-3">
+        <span className="min-w-0">
+          <span className="block text-sm font-medium">Ask AI onboarding</span>
+          <span className="mt-0.5 block text-xs text-muted-foreground">
+            Shows the coachmark on each demo load.
+          </span>
+        </span>
+        <Switch checked={onboardingEnabled} onCheckedChange={onOnboardingChange} />
+      </label>
+
+      <label className="mt-2 flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border bg-secondary/30 p-3">
+        <span className="min-w-0">
+          <span className="block text-sm font-medium">Dark mode</span>
+          <span className="mt-0.5 block text-xs text-muted-foreground">
+            Switches the dashboard theme.
+          </span>
+        </span>
+        <Switch checked={darkMode} onCheckedChange={onDarkModeChange} />
+      </label>
+    </PopoverContent>
+  );
 }

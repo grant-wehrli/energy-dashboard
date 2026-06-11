@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LineChart, Lightbulb, Target } from "lucide-react";
 import { Toaster } from "sonner";
 import { Sidebar, type NavKey } from "./Sidebar";
@@ -11,7 +11,9 @@ import { PlaceholderView } from "@/components/views/PlaceholderView";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { SourceModal } from "@/components/modals/SourceModal";
 import { AnalogyModal } from "@/components/modals/AnalogyModal";
+import { OnboardingCoachmark } from "./OnboardingCoachmark";
 import { analogies } from "@/data/mockData";
+import { DEMO_ONBOARDING_ENABLED } from "@/config/onboarding";
 import type { Timeframe } from "@/types/energy";
 
 type SubView = "dashboard" | "summary" | "recommendations";
@@ -23,6 +25,13 @@ export function AppShell() {
   const [chatOpen, setChatOpen] = useState(false);
   const [costExplainOpen, setCostExplainOpen] = useState(false);
   const [chartExplainOpen, setChartExplainOpen] = useState(false);
+  const [onboardingEnabled, setOnboardingEnabled] = useState(DEMO_ONBOARDING_ENABLED);
+  const [coachmarkOpen, setCoachmarkOpen] = useState(DEMO_ONBOARDING_ENABLED);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
 
   const handleNav = (k: NavKey) => {
     setNav(k);
@@ -42,15 +51,40 @@ export function AppShell() {
     setChatOpen(false);
   };
 
-  return (
-    <div className="flex h-dvh w-full overflow-hidden bg-background text-foreground">
-      <Sidebar active={nav} onChange={handleNav} onHome={handleHome} />
+  const handleAskAI = () => {
+    setChatOpen(true);
+    setCoachmarkOpen(false);
+  };
 
-      <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden pb-20 md:pb-0">
-        <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col overflow-hidden px-3 py-3 sm:px-4 md:px-6 md:py-4">
-          <div className="mb-3 flex shrink-0 items-start justify-between gap-3 md:mb-4 md:gap-4">
+  const handleOnboardingChange = (enabled: boolean) => {
+    setOnboardingEnabled(enabled);
+    setCoachmarkOpen(enabled);
+  };
+
+  return (
+    <div className="flex h-dvh w-full overflow-hidden bg-canvas text-foreground md:bg-background">
+      <Sidebar
+        active={nav}
+        onChange={handleNav}
+        onHome={handleHome}
+        onAskAI={handleAskAI}
+        askAIAttention={onboardingEnabled && coachmarkOpen && !chatOpen}
+        onboardingEnabled={onboardingEnabled}
+        onOnboardingChange={handleOnboardingChange}
+        darkMode={darkMode}
+        onDarkModeChange={setDarkMode}
+        onSettingsOpen={() => setCoachmarkOpen(false)}
+      />
+
+      <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col overflow-hidden px-0 py-0 sm:px-4 md:px-6 md:py-4">
+          <div className="flex shrink-0 items-start justify-center gap-3 bg-canvas px-3 py-3 md:mb-4 md:justify-between md:bg-transparent md:px-0 md:py-0">
             <TopTabs value={timeframe} onChange={handleTimeframe} />
-            <AskAIButton onClick={() => setChatOpen(true)} />
+            <AskAIButton
+              onClick={handleAskAI}
+              attention={onboardingEnabled && coachmarkOpen && !chatOpen}
+              className="hidden md:inline-flex"
+            />
           </div>
 
           <div className="min-h-0 flex-1 overflow-hidden">
@@ -99,6 +133,11 @@ export function AppShell() {
         </div>
       </main>
 
+      <OnboardingCoachmark
+        open={onboardingEnabled && coachmarkOpen && !chatOpen}
+        onAskAI={handleAskAI}
+        onDismiss={() => setCoachmarkOpen(false)}
+      />
       <ChatPanel open={chatOpen} onOpenChange={setChatOpen} timeframe={timeframe} />
       <SourceModal open={costExplainOpen} onOpenChange={setCostExplainOpen} />
       <AnalogyModal
